@@ -5,8 +5,8 @@ const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
 
 
-const getUsers = (req, res) => {
-    db.query(`SELECT * FROM miembro`, (err, result) => {
+const getAdmins = (req, res) => {
+    db.query(`SELECT * FROM admin`, (err, result) => {
         if (err) {
             console.error(err);
             res.status(500).send(err);
@@ -20,23 +20,23 @@ const getUsers = (req, res) => {
     });
 };
 
-const getUser = (req, res) => {
-    db.query('SELECT * FROM miembro WHERE id_miembro = ?', [req.params.id], (err, result) => {
+const getAdmin = (req, res) => {
+    db.query('SELECT * FROM admin WHERE id_admin = ?', [req.params.id], (err, result) => {
         if (err) {
             console.error(err);
             return res.status(500).send(err);
         }
 
         if (result.length === 0) {
-            return res.status(404).json({ message: 'Usuario no existente en la base de datos' });
+            return res.status(404).json({ message: 'el Admin no existente en la base de datos' });
         }
 
         res.json(result[0]);
     });
 };
 
-const createUser = (req, res) => {
-    const { nombre, correo, contrasena, fk_rol, fk_equipo } = req.body;
+const createAdmin = (req, res) => {
+    const { nombre, correo, contrasena, numero_telefonico, pregunta_seguridad } = req.body;
 
     // Encriptar la contraseña antes de almacenarla en la base de datos
     bcrypt.hash(contrasena, 10, (err, hash) => {
@@ -45,7 +45,7 @@ const createUser = (req, res) => {
             return res.status(500).json({ message: 'Error al encriptar la contraseña' });
         }
 
-        db.query('INSERT INTO miembro(nombre, correo, contrasena, fk_rol, fk_equipo) VALUES (?,?,?,?,?)', [nombre, correo, hash, fk_rol, fk_equipo], (err, result) => {
+        db.query('INSERT INTO admin(nombre, correo, contrasena, numero_telefonico, pregunta_seguridad) VALUES (?,?,?,?,?)', [nombre, correo, hash, numero_telefonico, pregunta_seguridad], (err, result) => {
             if (err) {
                 console.error(err);
                 return res.status(500).json({ message: err.message });
@@ -55,8 +55,8 @@ const createUser = (req, res) => {
                 id: result.insertId,
                 nombre,
                 correo,
-                fk_rol,
-                fk_equipo
+                numero_telefonico,
+                pregunta_seguridad
             });
         });
     });
@@ -64,8 +64,8 @@ const createUser = (req, res) => {
 
 
 
-const updateUser = (req, res) => {
-    const { nombre, correo, contrasena, fk_rol, fk_equipo } = req.body;
+const updateAdmin = (req, res) => {
+    const { nombre, correo, contrasena, numero_telefonico, pregunta_seguridad } = req.body;
 
     // Solo encriptar la contraseña si se proporciona en la solicitud
     if (contrasena) {
@@ -76,8 +76,8 @@ const updateUser = (req, res) => {
             }
 
             // Actualizar la base de datos con la contraseña encriptada
-            db.query('UPDATE miembro SET nombre=?, correo=?, contrasena=?, fk_rol=?, fk_equipo=? WHERE id_miembro=?',
-                [nombre, correo, hash, fk_rol, fk_equipo, req.params.id],
+            db.query('UPDATE admin SET nombre=?, correo=?, contrasena=?, numero_telefonico=?, pregunta_seguridad=? WHERE id_admin=?',
+                [nombre, correo, hash, numero_telefonico, pregunta_seguridad, req.params.id],
                 (err, result) => {
                     if (err) {
                         console.error(err);
@@ -89,8 +89,8 @@ const updateUser = (req, res) => {
         });
     } else {
         // Si no se proporciona una nueva contraseña, actualizar la base de datos sin modificar la contraseña
-        db.query('UPDATE miembro SET nombre=?, correo=?, fk_rol=?, fk_equipo=? WHERE id_miembro=?',
-            [nombre, correo, fk_rol, fk_equipo, req.params.id],
+        db.query('UPDATE admin SET nombre=?, correo=?, numero_telefonico=?, pregunta_seguridad=? WHERE id_admin=?',
+            [nombre, correo, numero_telefonico, pregunta_seguridad, req.params.id],
             (err, result) => {
                 if (err) {
                     console.error(err);
@@ -103,15 +103,15 @@ const updateUser = (req, res) => {
 };
 
 
-const deleteUser = (req, res) => {
-    db.query('DELETE FROM miembro WHERE id_miembro = ?', [req.params.id], (err, result) => {
+const deleteAdmin = (req, res) => {
+    db.query('DELETE FROM admin WHERE id_admin = ?', [req.params.id], (err, result) => {
         if (err) {
             console.error(err);
             return res.status(500).json({ message: err.message });
         }
 
         if (result.affectedRows === 0) {
-            return res.status(404).json({ message: 'Usuario no existente en la base de datos' });
+            return res.status(404).json({ message: 'el Admin no existente en la base de datos' });
         }
 
         res.sendStatus(204);
@@ -120,9 +120,9 @@ const deleteUser = (req, res) => {
 
 
 const signup = (req, res) => {
-    const { nombre, correo, contrasena, fk_rol, fk_equipo } = req.body;
+    const { nombre, correo, contrasena, numero_telefonico, pregunta_seguridad } = req.body;
 
-    db.query('SELECT * FROM miembro WHERE correo = ?', [correo], (err, result) => {
+    db.query('SELECT * FROM admin WHERE correo = ?', [correo], (err, result) => {
         if (err) {
             console.error(err);
             return res.status(500).json({ message: err.message });
@@ -132,40 +132,43 @@ const signup = (req, res) => {
             return res.status(409).json({ message: "El correo ya existe en la base de datos" });
         }
 
+        // Encriptar la contraseña
         bcrypt.hash(contrasena, 10, (err, hash) => {
             if (err) {
                 console.error(err);
                 return res.status(500).json({ message: 'Error al encriptar la contraseña' });
             }
 
-            db.query('INSERT INTO miembro(nombre=?, correo=?, contrasena=?, fk_rol=?, fk_equipo=?) VALUES (?,?,?,?,?)',
-                [nombre, correo, hash, fk_rol, fk_equipo],
+            // Utilizar el valor de pregunta_seguridad obtenido de la solicitud
+            db.query('INSERT INTO admin(nombre=?, correo=?, contrasena=?, numero_telefonico=?, pregunta_seguridad=?) VALUES (?,?,?,?,?)',
+                [nombre, correo, hash, numero_telefonico, pregunta_seguridad],
                 (err, result) => {
                     if (err) {
                         console.error(err);
                         return res.status(500).json({ message: err.message });
                     }
 
-                    const token = jwt.sign({ id: result.insertId, correo, nombre, fk_rol, fk_equipo }, 'secreto', { expiresIn: '1h' });
+                    // Crear y firmar el token JWT
+                    const token = jwt.sign({ id: result.insertId, correo, nombre }, 'secreto', { expiresIn: '1h' });
 
                     res.json({
                         id: result.insertId,
                         nombre,
                         correo,
-                        fk_rol,
-                        fk_equipo,
+                        numero_telefonico,
+                        pregunta_seguridad,
                         token,
                     });
                 }
             );
         });
     });
-};
+}
 
 const login = (req, res) => {
     const { correo, contrasena } = req.body;
 
-    db.query('SELECT * FROM miembro WHERE correo = ?', [correo], (err, result) => {
+    db.query('SELECT * FROM admin WHERE correo = ?', [correo], (err, result) => {
         if (err) {
             console.error(err);
             return res.status(500).json({ message: err.message });
@@ -175,6 +178,7 @@ const login = (req, res) => {
             return res.status(404).json({ message: "El correo no existe en la base de datos" });
         }
 
+        // Comparar contraseñas encriptadas
         bcrypt.compare(contrasena, result[0].contrasena, (errorComparar, comparar) => {
             if (errorComparar) {
                 console.error(errorComparar);
@@ -185,14 +189,15 @@ const login = (req, res) => {
                 return res.status(401).json({ message: "Credenciales incorrectas" });
             }
 
-            const token = jwt.sign({ id: result[0].id_miembro, correo, nombre: result[0].nombre, fk_rol: result[0].fk_rol, fk_equipo: result[0].fk_equipo }, 'secreto', { expiresIn: '1h' });
+            // Contraseña válida, crear y firmar el token JWT
+            const token = jwt.sign({ id: result[0].id_admin, correo, nombre: result[0].nombre }, 'secreto', { expiresIn: '1h' });
 
             res.json({
-                id: result[0].id_miembro,
+                id: result[0].id_admin,
                 nombre: result[0].nombre,
                 correo,
-                fk_rol: result[0].fk_rol,
-                fk_equipo: result[0].fk_equipo,
+                numero_telefonico: result[0].numero_telefonico,
+                pregunta_seguridad: result[0].pregunta_seguridad,
                 token,
             });
         });
@@ -200,11 +205,11 @@ const login = (req, res) => {
 };
 
 module.exports = {
-    getUsers,
-    getUser,
-    createUser,
-    updateUser,
-    deleteUser,
+    getAdmin,
+    getAdmins,
+    createAdmin,
+    updateAdmin,
+    deleteAdmin,
     signup,
     login
-};
+}

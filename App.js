@@ -24,6 +24,9 @@ app.use(RecursoRouter);
 const RolesRouter = require ('./routes/roles_routes');
 app.use(RolesRouter);
 
+const AdminRouter = require ('./routes/admin_routes');
+app.use(AdminRouter);
+
 app.listen(port, () => {
   console.log(`Servidor escuchando en http://localhost:${port}`);
 });
