@@ -1,0 +1,43 @@
+# Dependencias
+/node_modules
+
+# Archivos de configuración
+.env
+
+# Logs
+logs
+*.log
+npm-debug.log*
+
+# Carpeta compilada
+/dist
+
+# Dependencias locales
+/.pnp
+.pnp.js
+
+# Recursos de construcción
+/build
+
+# Archivos temporales
+*.tmp
+*.swp
+*.bak
+*~
+
+# Documentación generada
+/doc
+
+# Carpetas específicas del IDE
+.idea
+.vscode
+
+# Archivos de configuración del usuario
+.eslintcache
+*.pid
+*.seed
+*.pid.lock
+
+# Configuración de sistema
+.DS_Store
+Thumbs.db
