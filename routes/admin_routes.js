@@ -1,31 +1,33 @@
 const express = require('express');
 const router = express.Router();
-const loginControllers = require('../controllers/admin_controllers')
+const adminControllers = require('../controllers/admin_controllers'); // Cambié AdminConntrollers a adminControllers
 
 // Rutas para operaciones CRUD en miembros
 
 // Obtener todos los miembros
-router.get('/admins', loginControllers.getAdmins);
+router.get('/admins', (req, res) => {
+    console.log('Llamada a /admins');
+    adminControllers.getAlladmin(req, res);
+  });
 
 // Obtener un miembro por ID
-router.get("/admins/:id", loginControllers.getAdmin);
+router.get("/admins/:id", adminControllers.getAdmin);
 
 // Crear un nuevo miembro
-router.post("/admins", loginControllers.createAdmin);
+router.post("/admins", adminControllers.createAdmin);
 
 // Actualizar un miembro por ID
-router.put("/admins/:id", loginControllers.updateAdmin);
+router.put("/admins/:id", adminControllers.updateAdmin);
 
 // Eliminar un miembro por ID
-router.delete("/admins/:id", loginControllers.deleteAdmin);
+router.delete("/admins/:id", adminControllers.deleteAdmin);
 
 // Rutas adicionales para autenticación
 
 // Registro de un nuevo miembro
-router.post('/signup/admin', loginControllers.signup);
+router.post('/signup/admin', adminControllers.signup);
 
 // Inicio de sesión
-router.post('/login/admin', loginControllers.login);
+router.post('/login/admin', adminControllers.login);
 
 module.exports = router;
-

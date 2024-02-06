@@ -5,8 +5,9 @@ const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
 
 
-const getAdmins = (req, res) => {
-    db.query(`SELECT * FROM admin`, (err, result) => {
+const getAlladmin = (req, res) => {
+    console.log('Entrando en getAlladmin');
+    db.query('SELECT * FROM admin', (err, result) => {
         if (err) {
             console.error(err);
             res.status(500).send(err);
@@ -205,8 +206,8 @@ const login = (req, res) => {
 };
 
 module.exports = {
+    getAlladmin,
     getAdmin,
-    getAdmins,
     createAdmin,
     updateAdmin,
     deleteAdmin,
