@@ -36,7 +36,7 @@ const getUser = (req, res) => {
 };
 
 const createUser = (req, res) => {
-    const { nombre, correo, contrasena, fk_rol, fk_equipo } = req.body;
+    const { nombre, correo_electronico, contrasena, fk_rol, fk_equipo } = req.body;
 
     // Encriptar la contraseña antes de almacenarla en la base de datos
     bcrypt.hash(contrasena, 10, (err, hash) => {
@@ -45,7 +45,7 @@ const createUser = (req, res) => {
             return res.status(500).json({ message: 'Error al encriptar la contraseña' });
         }
 
-        db.query('INSERT INTO miembro(nombre, correo, contrasena, fk_rol, fk_equipo) VALUES (?,?,?,?,?)', [nombre, correo, hash, fk_rol, fk_equipo], (err, result) => {
+        db.query('INSERT INTO miembro(nombre, correo_electronico, contrasena, fk_rol, fk_equipo) VALUES (?,?,?,?,?)', [nombre, correo_electronico, hash, fk_rol, fk_equipo], (err, result) => {
             if (err) {
                 console.error(err);
                 return res.status(500).json({ message: err.message });
@@ -54,7 +54,7 @@ const createUser = (req, res) => {
             res.json({
                 id: result.insertId,
                 nombre,
-                correo,
+                correo_electronico,
                 fk_rol,
                 fk_equipo
             });
@@ -65,7 +65,7 @@ const createUser = (req, res) => {
 
 
 const updateUser = (req, res) => {
-    const { nombre, correo, contrasena, fk_rol, fk_equipo } = req.body;
+    const { nombre, correo_electronico, contrasena, fk_rol, fk_equipo } = req.body;
 
     // Solo encriptar la contraseña si se proporciona en la solicitud
     if (contrasena) {
@@ -76,8 +76,8 @@ const updateUser = (req, res) => {
             }
 
             // Actualizar la base de datos con la contraseña encriptada
-            db.query('UPDATE miembro SET nombre=?, correo=?, contrasena=?, fk_rol=?, fk_equipo=? WHERE id_miembro=?',
-                [nombre, correo, hash, fk_rol, fk_equipo, req.params.id],
+            db.query('UPDATE miembro SET nombre=?, correo_electronico=?, contrasena=?, fk_rol=?, fk_equipo=? WHERE id_miembro=?',
+                [nombre, correo_electronico, hash, fk_rol, fk_equipo, req.params.id],
                 (err, result) => {
                     if (err) {
                         console.error(err);
@@ -89,8 +89,8 @@ const updateUser = (req, res) => {
         });
     } else {
         // Si no se proporciona una nueva contraseña, actualizar la base de datos sin modificar la contraseña
-        db.query('UPDATE miembro SET nombre=?, correo=?, fk_rol=?, fk_equipo=? WHERE id_miembro=?',
-            [nombre, correo, fk_rol, fk_equipo, req.params.id],
+        db.query('UPDATE miembro SET nombre=?, correo_electronico=?, fk_rol=?, fk_equipo=? WHERE id_miembro=?',
+            [nombre, correo_electronico, fk_rol, fk_equipo, req.params.id],
             (err, result) => {
                 if (err) {
                     console.error(err);
@@ -120,16 +120,16 @@ const deleteUser = (req, res) => {
 
 
 const signup = (req, res) => {
-    const { nombre, correo, contrasena, fk_rol, fk_equipo } = req.body;
+    const { nombre, correo_electronico, contrasena, fk_rol, fk_equipo } = req.body;
 
-    db.query('SELECT * FROM miembro WHERE correo = ?', [correo], (err, result) => {
+    db.query('SELECT * FROM miembro WHERE correo_electronico = ?', [correo_electronico], (err, result) => {
         if (err) {
             console.error(err);
             return res.status(500).json({ message: err.message });
         }
 
         if (result.length > 0) {
-            return res.status(409).json({ message: "El correo ya existe en la base de datos" });
+            return res.status(409).json({ message: "El correo_electronico ya existe en la base de datos" });
         }
 
         bcrypt.hash(contrasena, 10, (err, hash) => {
@@ -138,20 +138,20 @@ const signup = (req, res) => {
                 return res.status(500).json({ message: 'Error al encriptar la contraseña' });
             }
 
-            db.query('INSERT INTO miembro(nombre=?, correo=?, contrasena=?, fk_rol=?, fk_equipo=?) VALUES (?,?,?,?,?)',
-                [nombre, correo, hash, fk_rol, fk_equipo],
+            db.query('INSERT INTO miembro(nombre=?, correo_electronico=?, contrasena=?, fk_rol=?, fk_equipo=?) VALUES (?,?,?,?,?)',
+                [nombre, correo_electronico, hash, fk_rol, fk_equipo],
                 (err, result) => {
                     if (err) {
                         console.error(err);
                         return res.status(500).json({ message: err.message });
                     }
 
-                    const token = jwt.sign({ id: result.insertId, correo, nombre, fk_rol, fk_equipo }, 'secreto', { expiresIn: '1h' });
+                    const token = jwt.sign({ id: result.insertId, correo_electronico, nombre, fk_rol, fk_equipo }, 'secreto', { expiresIn: '1h' });
 
                     res.json({
                         id: result.insertId,
                         nombre,
-                        correo,
+                        correo_electronico,
                         fk_rol,
                         fk_equipo,
                         token,
@@ -163,16 +163,16 @@ const signup = (req, res) => {
 };
 
 const login = (req, res) => {
-    const { correo, contrasena } = req.body;
+    const { correo_electronico, contrasena } = req.body;
 
-    db.query('SELECT * FROM miembro WHERE correo = ?', [correo], (err, result) => {
+    db.query('SELECT * FROM miembro WHERE correo_electronico = ?', [correo_electronico], (err, result) => {
         if (err) {
             console.error(err);
             return res.status(500).json({ message: err.message });
         }
 
         if (result.length === 0) {
-            return res.status(404).json({ message: "El correo no existe en la base de datos" });
+            return res.status(404).json({ message: "El correo_electronico no existe en la base de datos" });
         }
 
         bcrypt.compare(contrasena, result[0].contrasena, (errorComparar, comparar) => {
@@ -185,12 +185,12 @@ const login = (req, res) => {
                 return res.status(401).json({ message: "Credenciales incorrectas" });
             }
 
-            const token = jwt.sign({ id: result[0].id_miembro, correo, nombre: result[0].nombre, fk_rol: result[0].fk_rol, fk_equipo: result[0].fk_equipo }, 'secreto', { expiresIn: '1h' });
+            const token = jwt.sign({ id: result[0].id_miembro, correo_electronico, nombre: result[0].nombre, fk_rol: result[0].fk_rol, fk_equipo: result[0].fk_equipo }, 'secreto', { expiresIn: '1h' });
 
             res.json({
                 id: result[0].id_miembro,
                 nombre: result[0].nombre,
-                correo,
+                correo_electronico,
                 fk_rol: result[0].fk_rol,
                 fk_equipo: result[0].fk_equipo,
                 token,

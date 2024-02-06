@@ -36,72 +36,84 @@ const getAdmin = (req, res) => {
     });
 };
 
-const createAdmin = (req, res) => {
-    const { nombre, correo, contrasena, numero_telefonico, pregunta_seguridad } = req.body;
+const createAdmin = async (req, res) => {
+    try {
+        const { nombre, correo_electronico, contrasena, numero_telefonico, pregunta_seguridad } = req.body;
+        console.log('Valores recibidos:', nombre, correo_electronico, contrasena, numero_telefonico, pregunta_seguridad);
 
-    // Encriptar la contraseña antes de almacenarla en la base de datos
-    bcrypt.hash(contrasena, 10, (err, hash) => {
-        if (err) {
-            console.error(err);
-            return res.status(500).json({ message: 'Error al encriptar la contraseña' });
-        }
+        // Encriptar la contraseña antes de almacenarla en la base de datos
+        const hashedPassword = await bcrypt.hash(contrasena, 10);
 
-        db.query('INSERT INTO admin(nombre, correo, contrasena, numero_telefonico, pregunta_seguridad) VALUES (?,?,?,?,?)', [nombre, correo, hash, numero_telefonico, pregunta_seguridad], (err, result) => {
-            if (err) {
-                console.error(err);
-                return res.status(500).json({ message: err.message });
-            }
-
-            res.json({
-                id: result.insertId,
-                nombre,
-                correo,
-                numero_telefonico,
-                pregunta_seguridad
-            });
-        });
-    });
-};
-
-
-
-const updateAdmin = (req, res) => {
-    const { nombre, correo, contrasena, numero_telefonico, pregunta_seguridad } = req.body;
-
-    // Solo encriptar la contraseña si se proporciona en la solicitud
-    if (contrasena) {
-        bcrypt.hash(contrasena, 10, (err, hash) => {
-            if (err) {
-                console.error(err);
-                return res.status(500).json({ message: 'Error al encriptar la contraseña' });
-            }
-
-            // Actualizar la base de datos con la contraseña encriptada
-            db.query('UPDATE admin SET nombre=?, correo=?, contrasena=?, numero_telefonico=?, pregunta_seguridad=? WHERE id_admin=?',
-                [nombre, correo, hash, numero_telefonico, pregunta_seguridad, req.params.id],
-                (err, result) => {
-                    if (err) {
-                        console.error(err);
-                        return res.status(500).json({ message: err.message });
-                    }
-                    res.json(result);
-                }
-            );
-        });
-    } else {
-        // Si no se proporciona una nueva contraseña, actualizar la base de datos sin modificar la contraseña
-        db.query('UPDATE admin SET nombre=?, correo=?, numero_telefonico=?, pregunta_seguridad=? WHERE id_admin=?',
-            [nombre, correo, numero_telefonico, pregunta_seguridad, req.params.id],
+        db.query(
+            'INSERT INTO admin(nombre, correo_electronico, contrasena, numero_telefonico, pregunta_seguridad) VALUES (?,?,?,?,?)',
+            [nombre, correo_electronico, hashedPassword, numero_telefonico, pregunta_seguridad],
             (err, result) => {
                 if (err) {
                     console.error(err);
                     return res.status(500).json({ message: err.message });
                 }
-                res.json(result);
+
+                res.json({
+                    id: result.insertId,
+                    nombre,
+                    correo_electronico,
+                    numero_telefonico,
+                    pregunta_seguridad
+                });
             }
         );
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: 'Error al encriptar la contraseña' });
     }
 };
+
+
+
+
+const updateAdmin = async (req, res) => {
+    try {
+        const { nombre, correo_electronico, contrasena, numero_telefonico, pregunta_seguridad } = req.body;
+
+        // Verificar si se proporciona una nueva contraseña
+        if (contrasena) {
+            // Encriptar la nueva contraseña
+            const hashedPassword = await bcrypt.hash(contrasena, 10);
+
+            // Actualizar la base de datos con la nueva contraseña encriptada
+            db.query(
+                'UPDATE admin SET nombre=?, correo_electronico=?, contrasena=?, numero_telefonico=?, pregunta_seguridad=? WHERE id_admin=?',
+                [nombre, correo_electronico, hashedPassword, numero_telefonico, pregunta_seguridad, req.params.id],
+                (err, result) => {
+                    if (err) {
+                        console.error(err);
+                        return res.status(500).json({ message: 'Error al actualizar el administrador' });
+                    }
+                    // Devolver una respuesta informativa
+                    res.json({ message: 'Administrador actualizado exitosamente' });
+                }
+            );
+        } else {
+            // Si no se proporciona una nueva contraseña, actualizar la base de datos sin modificar la contraseña
+            db.query(
+                'UPDATE admin SET nombre=?, correo_electronico=?, numero_telefonico=?, pregunta_seguridad=? WHERE id_admin=?',
+                [nombre, correo_electronico, numero_telefonico, pregunta_seguridad, req.params.id],
+                (err, result) => {
+                    if (err) {
+                        console.error(err);
+                        return res.status(500).json({ message: 'Error al actualizar el administrador' });
+                    }
+                    // Devolver una respuesta informativa
+                    res.json({ message: 'Administrador actualizado exitosamente' });
+                }
+            );
+        }
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: 'Error al encriptar la contraseña' });
+    }
+};
+
 
 
 const deleteAdmin = (req, res) => {
@@ -121,16 +133,16 @@ const deleteAdmin = (req, res) => {
 
 
 const signup = (req, res) => {
-    const { nombre, correo, contrasena, numero_telefonico, pregunta_seguridad } = req.body;
+    const { nombre, correo_electronico, contrasena, numero_telefonico, pregunta_seguridad } = req.body;
 
-    db.query('SELECT * FROM admin WHERE correo = ?', [correo], (err, result) => {
+    db.query('SELECT * FROM admin WHERE correo_electronico = ?', [correo_electronico], (err, result) => {
         if (err) {
             console.error(err);
             return res.status(500).json({ message: err.message });
         }
 
         if (result.length > 0) {
-            return res.status(409).json({ message: "El correo ya existe en la base de datos" });
+            return res.status(409).json({ message: "El correo_electronico ya existe en la base de datos" });
         }
 
         // Encriptar la contraseña
@@ -141,8 +153,8 @@ const signup = (req, res) => {
             }
 
             // Utilizar el valor de pregunta_seguridad obtenido de la solicitud
-            db.query('INSERT INTO admin(nombre=?, correo=?, contrasena=?, numero_telefonico=?, pregunta_seguridad=?) VALUES (?,?,?,?,?)',
-                [nombre, correo, hash, numero_telefonico, pregunta_seguridad],
+            db.query('INSERT INTO admin(nombre=?, correo_electronico=?, contrasena=?, numero_telefonico=?, pregunta_seguridad=?) VALUES (?,?,?,?,?)',
+                [nombre, correo_electronico, hash, numero_telefonico, pregunta_seguridad],
                 (err, result) => {
                     if (err) {
                         console.error(err);
@@ -150,12 +162,12 @@ const signup = (req, res) => {
                     }
 
                     // Crear y firmar el token JWT
-                    const token = jwt.sign({ id: result.insertId, correo, nombre }, 'secreto', { expiresIn: '1h' });
+                    const token = jwt.sign({ id: result.insertId, correo_electronico, nombre }, 'secreto', { expiresIn: '1h' });
 
                     res.json({
                         id: result.insertId,
                         nombre,
-                        correo,
+                        correo_electronico,
                         numero_telefonico,
                         pregunta_seguridad,
                         token,
@@ -167,16 +179,16 @@ const signup = (req, res) => {
 }
 
 const login = (req, res) => {
-    const { correo, contrasena } = req.body;
+    const { correo_electronico, contrasena } = req.body;
 
-    db.query('SELECT * FROM admin WHERE correo = ?', [correo], (err, result) => {
+    db.query('SELECT * FROM admin WHERE correo_electronico = ?', [correo_electronico], (err, result) => {
         if (err) {
             console.error(err);
             return res.status(500).json({ message: err.message });
         }
 
         if (result.length === 0) {
-            return res.status(404).json({ message: "El correo no existe en la base de datos" });
+            return res.status(404).json({ message: "El correo_electronico no existe en la base de datos" });
         }
 
         // Comparar contraseñas encriptadas
@@ -191,12 +203,12 @@ const login = (req, res) => {
             }
 
             // Contraseña válida, crear y firmar el token JWT
-            const token = jwt.sign({ id: result[0].id_admin, correo, nombre: result[0].nombre }, 'secreto', { expiresIn: '1h' });
+            const token = jwt.sign({ id: result[0].id_admin, correo_electronico, nombre: result[0].nombre }, 'secreto', { expiresIn: '1h' });
 
             res.json({
                 id: result[0].id_admin,
                 nombre: result[0].nombre,
-                correo,
+                correo_electronico,
                 numero_telefonico: result[0].numero_telefonico,
                 pregunta_seguridad: result[0].pregunta_seguridad,
                 token,
