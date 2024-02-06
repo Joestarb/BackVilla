@@ -1,7 +1,11 @@
 const express = require('express');
 const cors = require('cors');
+const fs = require('fs');
+const https = require('https');
 const app = express();
 const port = 8080;
+
+
 
 app.use(express.json());
 app.use(cors());
@@ -25,8 +29,12 @@ const RolesRouter = require ('./routes/roles_routes');
 app.use(RolesRouter);
 
 const AdminRouter = require ('./routes/admin_routes');
+const { create } = require('domain');
 app.use(AdminRouter);
 
-app.listen(port, () => {
-  console.log(`Servidor escuchando en http://localhost:${port}`);
+https.createServer({
+  cert: fs.readFileSync('localhost.crt'),
+  key: fs.readFileSync('localhost.key')
+}, app).listen(port, () => {
+  console.log(`Servidor escuchando en https://localhost:${port}`);
 });
