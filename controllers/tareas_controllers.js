@@ -18,15 +18,21 @@ const createTarea = async (req, res) => {
 };
 
 
-const getaAllTareas = async (req, res) => {
-  try {
-    const tareas = await db.query('SELECT * FROM tarea');
-    return res.status(200).json(tareas);
-  } catch (error) {
-    console.error(error);
-    return res.status(500).json({ error: 'Error al obtener las tareas' });
-  }
+
+
+
+const getAllTareas = (req, res) => {
+  const query = "SELECT * FROM tarea";
+
+  db.query(query, (error, result) => {
+    if (error) {
+      console.error(error);
+      return res.status(500).json({ message: 'Internal Server Error' });
+    }
+    return res.status(200).json(result); // Return the result in the response
+  });
 };
+
 
 
 const getTarea = async (req, res) => {
@@ -89,7 +95,7 @@ const deleteTarea = async (req, res) => {
 
 module.exports = { 
     createTarea, 
-    getaAllTareas,
+    getAllTareas,
     getTarea,
     updateTarea,
     deleteTarea };

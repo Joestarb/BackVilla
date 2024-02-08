@@ -6,7 +6,7 @@ const tareasControllers = require('../controllers/tareas_controllers');
 router.post('/tarea', tareasControllers.createTarea);
 
 // Obtener todos los roles
-router.get('/tarea', tareasControllers.getaAllTareas);
+router.get('/tarea', tareasControllers.getAllTareas);
 
 // Obtener un rol por ID
 router.get('/tarea/:id_tarea', tareasControllers.getTarea);
