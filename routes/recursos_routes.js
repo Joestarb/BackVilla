@@ -17,4 +17,8 @@ router.put('/recurso/:recurso_id', recursoControllers.updateRecurso);
 // Eliminar un recurso por ID
 router.delete('/recurso/:recurso_id', recursoControllers.deleteRecurso);
 
+router.get('/proyecto/:proyecto_id/contadorRecursos', recursoControllers.getContadorRecursos);
+
+
+
 module.exports = router;

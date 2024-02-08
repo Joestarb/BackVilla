@@ -62,11 +62,12 @@ const updateRecurso = (req, res) => {
     const recursoUpdate = req.body;
 
     const updateFields = Object.entries(recursoUpdate).reduce((acc, [key, value]) => {
-        if (value !== undefined) {
+        if (value !== undefined && value !== null) {
             acc[key] = value;
         }
         return acc;
     }, {});
+    
 
     if (Object.keys(updateFields).length === 0) {
         res.status(400).json({ message: 'No fields to update' });
@@ -112,10 +113,36 @@ const deleteRecurso = (req, res) => {
     });
 };
 
+const getContadorRecursos = (req, res) => {
+    const proyecto_id = req.params.proyecto_id;
+
+    try {
+        const query = 'SELECT COUNT(*) AS contador_recursos FROM recurso WHERE fk_proyecto = ?';
+
+        connection.query(query, [proyecto_id], (err, result) => {
+            if (err) {
+                console.error(err);
+                return res.status(500).json({ message: err.message });
+            }
+
+            if (result.length === 0) {
+                return res.status(404).json({ message: 'Proyecto not found' });
+            }
+
+            const contadorRecursos = result[0].contador_recursos;
+            res.json({ contadorRecursos });
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: error.message });
+    }
+};
+
 module.exports = {
     createRecurso,
     getAllRecursos,
     getRecursoById,
     updateRecurso,
-    deleteRecurso
+    deleteRecurso,
+    getContadorRecursos
 };

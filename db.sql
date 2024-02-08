@@ -79,3 +79,8 @@ CREATE TABLE recurso (
 	FOREIGN KEY (fk_equipo) REFERENCES equipo (id_equipo),
 	FOREIGN KEY (fk_estado) REFERENCES estado (id_estado)
 	);
+
+
+    SELECT COUNT(*) AS contador_recursos
+FROM recurso
+WHERE fk_proyecto = ?;
