@@ -3,8 +3,8 @@ const connection = require('../config/db'); // Ajusta la ruta según tu estructu
 const createRecurso = (req, res) => {
     const recursoCreate = req.body;
 
-    const query = "INSERT INTO recurso (tipo_recurso, nombre, funcionalidad) VALUES (?, ?, ?)";
-    const values = [recursoCreate.tipo_recurso, recursoCreate.nombre, recursoCreate.funcionalidad];
+    const query = "INSERT INTO recurso (tipo_recurso, nombre, funcionalidad, fk_proyecto) VALUES (?, ?, ?, ?)";
+    const values = [recursoCreate.tipo_recurso, recursoCreate.nombre, recursoCreate.funcionalidad, recursoCreate-fk_proyecto];
 
     connection.execute(query, values, (error, result) => {
         if (error) {

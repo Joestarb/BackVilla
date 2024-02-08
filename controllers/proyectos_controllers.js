@@ -5,7 +5,7 @@ const createProyecto = (req, res) => {
 
     try {
         const query = `
-            INSERT INTO proyecto (nombre, descripcion, fecha_inicio, fk_equipo, fk_estado, fk_recurso)
+            INSERT INTO proyecto (nombre, descripcion, fecha_inicio, fk_equipo, fk_estado )
             VALUES (?, ?, ?, ?, ?, ?)
         `;
         const values = [
@@ -14,7 +14,6 @@ const createProyecto = (req, res) => {
             proyecto_create.fecha_inicio,
             proyecto_create.fk_equipo,
             proyecto_create.fk_estado,
-            proyecto_create.fk_recurso,
         ];
 
         connection.query(query, values, (err, result) => {
@@ -62,7 +61,7 @@ const updateProyecto = (req, res) => {
     try {
         const query = `
             UPDATE proyecto
-            SET nombre = ?, descripcion = ?, fecha_inicio = ?, fk_equipo = ?, fk_estado = ?, fk_recurso = ?
+            SET nombre = ?, descripcion = ?, fecha_inicio = ?, fk_equipo = ?, fk_estado = ?
             WHERE id_proyecto = ?
         `;
         const values = [
@@ -71,7 +70,6 @@ const updateProyecto = (req, res) => {
             proyecto_update.fecha_inicio,
             proyecto_update.fk_equipo,
             proyecto_update.fk_estado,
-            proyecto_update.fk_recurso,
             proyecto_id,
         ];
 

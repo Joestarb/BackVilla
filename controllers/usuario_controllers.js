@@ -6,7 +6,7 @@ const jwt = require('jsonwebtoken');
 
 
 const getUsers = (req, res) => {
-    db.query(`SELECT * FROM miembro`, (err, result) => {
+    db.query(`SELECT * FROM usuario `, (err, result) => {
         if (err) {
             console.error(err);
             res.status(500).send(err);
@@ -21,7 +21,7 @@ const getUsers = (req, res) => {
 };
 
 const getUser = (req, res) => {
-    db.query('SELECT * FROM miembro WHERE id_miembro = ?', [req.params.id], (err, result) => {
+    db.query('SELECT * FROM usuario  WHERE id_usuario  = ?', [req.params.id], (err, result) => {
         if (err) {
             console.error(err);
             return res.status(500).send(err);
@@ -45,7 +45,7 @@ const createUser = (req, res) => {
             return res.status(500).json({ message: 'Error al encriptar la contraseña' });
         }
 
-        db.query('INSERT INTO miembro(nombre, correo_electronico, contrasena, fk_rol, fk_equipo) VALUES (?,?,?,?,?)', [nombre, correo_electronico, hash, fk_rol, fk_equipo], (err, result) => {
+        db.query('INSERT INTO usuario (nombre, correo_electronico, contrasena, fk_rol, fk_equipo) VALUES (?,?,?,?,?)', [nombre, correo_electronico, hash, fk_rol, fk_equipo], (err, result) => {
             if (err) {
                 console.error(err);
                 return res.status(500).json({ message: err.message });
@@ -76,7 +76,7 @@ const updateUser = (req, res) => {
             }
 
             // Actualizar la base de datos con la contraseña encriptada
-            db.query('UPDATE miembro SET nombre=?, correo_electronico=?, contrasena=?, fk_rol=?, fk_equipo=? WHERE id_miembro=?',
+            db.query('UPDATE usuario  SET nombre=?, correo_electronico=?, contrasena=?, fk_rol=?, fk_equipo=? WHERE id_usuario =?',
                 [nombre, correo_electronico, hash, fk_rol, fk_equipo, req.params.id],
                 (err, result) => {
                     if (err) {
@@ -89,7 +89,7 @@ const updateUser = (req, res) => {
         });
     } else {
         // Si no se proporciona una nueva contraseña, actualizar la base de datos sin modificar la contraseña
-        db.query('UPDATE miembro SET nombre=?, correo_electronico=?, fk_rol=?, fk_equipo=? WHERE id_miembro=?',
+        db.query('UPDATE usuario  SET nombre=?, correo_electronico=?, fk_rol=?, fk_equipo=? WHERE id_usuario =?',
             [nombre, correo_electronico, fk_rol, fk_equipo, req.params.id],
             (err, result) => {
                 if (err) {
@@ -104,7 +104,7 @@ const updateUser = (req, res) => {
 
 
 const deleteUser = (req, res) => {
-    db.query('DELETE FROM miembro WHERE id_miembro = ?', [req.params.id], (err, result) => {
+    db.query('DELETE FROM usuario  WHERE id_usuario  = ?', [req.params.id], (err, result) => {
         if (err) {
             console.error(err);
             return res.status(500).json({ message: err.message });
@@ -122,7 +122,7 @@ const deleteUser = (req, res) => {
 const signup = (req, res) => {
     const { nombre, correo_electronico, contrasena, fk_rol, fk_equipo } = req.body;
 
-    db.query('SELECT * FROM miembro WHERE correo_electronico = ?', [correo_electronico], (err, result) => {
+    db.query('SELECT * FROM usuario  WHERE correo_electronico = ?', [correo_electronico], (err, result) => {
         if (err) {
             console.error(err);
             return res.status(500).json({ message: err.message });
@@ -138,7 +138,7 @@ const signup = (req, res) => {
                 return res.status(500).json({ message: 'Error al encriptar la contraseña' });
             }
 
-            db.query('INSERT INTO miembro(nombre=?, correo_electronico=?, contrasena=?, fk_rol=?, fk_equipo=?) VALUES (?,?,?,?,?)',
+            db.query('INSERT INTO usuario (nombre=?, correo_electronico=?, contrasena=?, fk_rol=?, fk_equipo=?) VALUES (?,?,?,?,?)',
                 [nombre, correo_electronico, hash, fk_rol, fk_equipo],
                 (err, result) => {
                     if (err) {
@@ -165,7 +165,7 @@ const signup = (req, res) => {
 const login = (req, res) => {
     const { correo_electronico, contrasena } = req.body;
 
-    db.query('SELECT * FROM miembro WHERE correo_electronico = ?', [correo_electronico], (err, result) => {
+    db.query('SELECT * FROM usuario  WHERE correo_electronico = ?', [correo_electronico], (err, result) => {
         if (err) {
             console.error(err);
             return res.status(500).json({ message: err.message });
@@ -185,10 +185,10 @@ const login = (req, res) => {
                 return res.status(401).json({ message: "Credenciales incorrectas" });
             }
 
-            const token = jwt.sign({ id: result[0].id_miembro, correo_electronico, nombre: result[0].nombre, fk_rol: result[0].fk_rol, fk_equipo: result[0].fk_equipo }, 'secreto', { expiresIn: '1h' });
+            const token = jwt.sign({ id: result[0].id_usuario , correo_electronico, nombre: result[0].nombre, fk_rol: result[0].fk_rol, fk_equipo: result[0].fk_equipo }, 'secreto', { expiresIn: '1h' });
 
             res.json({
-                id: result[0].id_miembro,
+                id: result[0].id_usuario ,
                 nombre: result[0].nombre,
                 correo_electronico,
                 fk_rol: result[0].fk_rol,
