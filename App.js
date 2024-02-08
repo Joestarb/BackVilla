@@ -10,6 +10,7 @@ const port = 8080;
 app.use(express.json());
 app.use(cors());
 
+
 const LoginRouter = require ('./routes/login_routes');
 app.use(LoginRouter);
 
@@ -28,8 +29,8 @@ app.use(RecursoRouter);
 const RolesRouter = require ('./routes/roles_routes');
 app.use(RolesRouter);
 
-const AdminRouter = require ('./routes/admin_routes');
-app.use(AdminRouter);
+const TareasRouter = require ('./routes/tareas_routes.js');
+app.use(TareasRouter);
 
 https.createServer({
   cert: fs.readFileSync('localhost.crt'),
