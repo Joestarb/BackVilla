@@ -39,11 +39,12 @@ const createUser = (req, res) => {
     const { nombre, correo_electronico, contrasena, fk_rol, fk_equipo } = req.body;
 
     // Encriptar la contraseña antes de almacenarla en la base de datos
+    if (!contrasena || contrasena.trim() === '') {
+        return res.status(400).json({ message: 'La contraseña no puede estar vacía' });
+    }
+    
     bcrypt.hash(contrasena, 10, (err, hash) => {
-        if (err) {
-            console.error(err);
-            return res.status(500).json({ message: 'Error al encriptar la contraseña' });
-        }
+    
 
         db.query('INSERT INTO usuario (nombre, correo_electronico, contrasena, fk_rol, fk_equipo) VALUES (?,?,?,?,?)', [nombre, correo_electronico, hash, fk_rol, fk_equipo], (err, result) => {
             if (err) {

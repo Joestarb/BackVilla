@@ -19,8 +19,6 @@ const createTarea = async (req, res) => {
 
 
 
-
-
 const getAllTareas = (req, res) => {
   const query = "SELECT * FROM tarea";
 
