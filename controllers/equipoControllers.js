@@ -6,7 +6,7 @@ const createEquipo = (req, res) => {
     const query = "INSERT INTO equipo (nombre) VALUES (?)";
     const values = [equipoCreate.nombre];
 
-    connection.execute(query, values, (error, result) => {
+    connection.query(query, values, (error, result) => {
         if (error) {
             console.error(error);
             res.status(500).json({ message: 'Internal Server Error' });
@@ -78,7 +78,7 @@ const updateEquipo = (req, res) => {
 
     const values = [...Object.values(updateFields), equipoId];
 
-    connection.execute(query, values, (error, result) => {
+    connection.query(query, values, (error, result) => {
         if (error) {
             console.error(error);
             res.status(500).json({ message: 'Internal Server Error' });
@@ -97,8 +97,8 @@ const deleteEquipo = (req, res) => {
     const equipoId = req.params.equipo_id;
 
     // Desvincular miembros asociados al equipo
-    const updateMiembrosQuery = "UPDATE miembro SET fk_equipo = NULL WHERE fk_equipo = ?";
-    connection.execute(updateMiembrosQuery, [equipoId], (error) => {
+    const updateMiembrosQuery = "UPDATE usuario SET fk_equipo = NULL WHERE fk_equipo = ?";
+    connection.query(updateMiembrosQuery, [equipoId], (error) => {
         if (error) {
             console.error(error);
             res.status(500).json({ message: 'Internal Server Error' });
@@ -107,7 +107,7 @@ const deleteEquipo = (req, res) => {
 
         // Eliminar proyectos asociados al equipo
         const updateProyectosQuery = "UPDATE proyecto SET fk_equipo = NULL WHERE fk_equipo = ?";
-        connection.execute(updateProyectosQuery, [equipoId], (error) => {
+        connection.query(updateProyectosQuery, [equipoId], (error) => {
             if (error) {
                 console.error(error);
                 res.status(500).json({ message: 'Internal Server Error' });
@@ -116,7 +116,7 @@ const deleteEquipo = (req, res) => {
 
             // Eliminar el equipo
             const deleteEquipoQuery = "DELETE FROM equipo WHERE id_equipo = ?";
-            connection.execute(deleteEquipoQuery, [equipoId], (error, result) => {
+            connection.query(deleteEquipoQuery, [equipoId], (error, result) => {
                 if (error) {
                     console.error(error);
                     res.status(500).json({ message: 'Internal Server Error' });

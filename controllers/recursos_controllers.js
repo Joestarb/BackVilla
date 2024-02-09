@@ -4,9 +4,9 @@ const createRecurso = (req, res) => {
     const recursoCreate = req.body;
 
     const query = "INSERT INTO recurso (tipo_recurso, nombre, funcionalidad, fk_proyecto) VALUES (?, ?, ?, ?)";
-    const values = [recursoCreate.tipo_recurso, recursoCreate.nombre, recursoCreate.funcionalidad, recursoCreate-fk_proyecto];
+    const values = [recursoCreate.tipo_recurso, recursoCreate.nombre, recursoCreate.funcionalidad, recursoCreate.fk_proyecto];
 
-    connection.execute(query, values, (error, result) => {
+    connection.query(query, values, (error, result) => {
         if (error) {
             console.error(error);
             res.status(500).json({ message: 'Internal Server Error' });
@@ -79,7 +79,7 @@ const updateRecurso = (req, res) => {
 
     const values = [...Object.values(updateFields), recursoId];
 
-    connection.execute(query, values, (error, result) => {
+    connection.query(query, values, (error, result) => {
         if (error) {
             console.error(error);
             res.status(500).json({ message: 'Internal Server Error' });
@@ -98,7 +98,7 @@ const deleteRecurso = (req, res) => {
     const recursoId = req.params.recurso_id;
 
     const query = "DELETE FROM recurso WHERE id_recurso = ?";
-    connection.execute(query, [recursoId], (error, result) => {
+    connection.query(query, [recursoId], (error, result) => {
         if (error) {
             console.error(error);
             res.status(500).json({ message: 'Internal Server Error' });
