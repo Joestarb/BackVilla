@@ -33,8 +33,8 @@ const TareasRouter = require ('./routes/tareas_routes.js');
 app.use(TareasRouter);
 
 https.createServer({
-  cert: fs.readFileSync('localhost.crt'),
-  key: fs.readFileSync('localhost.key')
+  cert: fs.readFileSync('C:/Windows/System32/cert.crt'),
+  key: fs.readFileSync('C:/Windows/System32/cert.key')
 }, app).listen(port, () => {
   console.log(`Servidor escuchando en https://localhost:${port}`);
 });
