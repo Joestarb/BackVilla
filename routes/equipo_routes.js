@@ -17,4 +17,6 @@ router.put('/equipo/:equipo_id', equipoControllers.updateEquipo);
 // Eliminar un equipo por ID
 router.delete('/equipo/:equipo_id', equipoControllers.deleteEquipo);
 
+router.get('/equiposData', equipoControllers.getEquiposData);
+
 module.exports = router;

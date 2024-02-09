@@ -133,8 +133,24 @@ const deleteEquipo = (req, res) => {
     });
 };
 
+const getEquiposData = (req, res) => {
+    connection.query('SELECT * FROM equipoData', (err, result) => {
+        if (err) {
+            console.error(err);
+            return res.status(500).json({ message: err.message });
+        }
+
+        if (result.length > 0) {
+            res.status(200).json(result);
+        } else {
+            res.status(404).json({ message: 'No se encontraron datos de equipos' });
+        }
+    });
+};
+
 module.exports = {
     createEquipo,
+    getEquiposData,
     getAllEquipos,
     getEquipoById,
     updateEquipo,

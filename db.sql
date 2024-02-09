@@ -252,3 +252,12 @@ VALUES ('Tarea 1', 'Descripción de la Tarea 1', '2024-01-01', '2024-01-31', 1, 
 
 
 
+CREATE VIEW equipoData AS 
+SELECT 
+    e.id_equipo,
+    e.nombre AS nombre_equipo,
+    p.nombre AS nombre_proyecto
+FROM 
+    equipo e
+JOIN 
+    proyecto p ON e.fk_proyecto = p.id_proyecto;

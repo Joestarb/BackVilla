@@ -42,19 +42,6 @@ const getAllTareas = (req, res) => {
   });
 };
 
-const getAllTareasFromUser = (req, res) => {
-  const id = req.params.id
-  const query = "SELECT * FROM tarea_view WHERE usuario_id = ?";
-
-  db.query(query,id, (error, result) => {
-    if (error) {
-      console.error(error);
-      return res.status(500).json({ message: 'Internal Server Error' });
-    }
-    return res.status(200).json(result); // Return the result in the response
-  });
-};
-
 
 const getTarea = async (req, res) => {
   const { id } = req.params;
