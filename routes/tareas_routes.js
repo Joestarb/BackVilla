@@ -5,6 +5,8 @@ const tareasControllers = require('../controllers/tareas_controllers');
 // Crear un nuevo rol
 router.post('/tarea', tareasControllers.createTarea);
 
+router.get('/tareas/:id', tareasControllers.getAllTareasFromUser);
+
 // Obtener todos los roles
 router.get('/tarea', tareasControllers.getAllTareas);
 

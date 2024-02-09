@@ -139,7 +139,7 @@ const signup = (req, res) => {
                 return res.status(500).json({ message: 'Error al encriptar la contraseña' });
             }
 
-            db.query('INSERT INTO usuario (nombre=?, correo_electronico=?, contrasena=?, fk_rol=?, fk_equipo=?) VALUES (?,?,?,?,?)',
+            db.query('INSERT INTO usuario (nombre, correo_electronico, contrasena, fk_rol, fk_equipo) VALUES (?,?,?,?,?)',
                 [nombre, correo_electronico, hash, fk_rol, fk_equipo],
                 (err, result) => {
                     if (err) {
@@ -188,17 +188,24 @@ const login = (req, res) => {
 
             const token = jwt.sign({ id: result[0].id_usuario , correo_electronico, nombre: result[0].nombre, fk_rol: result[0].fk_rol, fk_equipo: result[0].fk_equipo }, 'secreto', { expiresIn: '1h' });
 
-            res.json({
-                id: result[0].id_usuario ,
-                nombre: result[0].nombre,
-                correo_electronico,
-                fk_rol: result[0].fk_rol,
-                fk_equipo: result[0].fk_equipo,
-                token,
+            db.query('SELECT * FROM usuarioData WHERE correo_electronico = ?', [correo_electronico], (err, userLogResult) => {
+                if (err) {
+                    console.error(err);
+                    return res.status(500).json({ message: err.message });
+                }
+
+                if (userLogResult.length === 0) {
+                    return res.status(404).json({ message: "No se pudo encontrar la información del usuario en la vista" });
+                }
+                res.json({
+                    ...userLogResult[0], 
+                    token,
+                });
             });
         });
     });
 };
+
 
 module.exports = {
     getUsers,
