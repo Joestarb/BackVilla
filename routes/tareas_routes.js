@@ -8,6 +8,8 @@ router.post('/tarea', tareasControllers.createTarea);
 // Obtener todos los roles
 router.get('/tarea', tareasControllers.getAllTareas);
 
+router.get('/tareas/:id', tareasControllers.getAllTareasFromUser);
+
 // Obtener un rol por ID
 router.get('/tarea/:id_tarea', tareasControllers.getTarea);
 
