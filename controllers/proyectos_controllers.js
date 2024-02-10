@@ -117,41 +117,39 @@ const deleteProyecto = (req, res) => {
             return res.status(500).json({ message: err.message });
         }
 
+        // Eliminar equipos asociados
         const deleteEquiposQuery = 'DELETE FROM equipo WHERE fk_proyecto = ?';
         connection.query(deleteEquiposQuery, [proyecto_id], (equiposError, equiposResult) => {
             if (equiposError) {
                 connection.rollback(() => {
                     console.error(equiposError);
-                    res.status(500).json({ message: equiposError.message });
+                    return res.status(500).json({ message: equiposError.message });
                 });
-            }
-
-            const deleteProyectoQuery = 'DELETE FROM proyecto WHERE id_proyecto = ?';
-            connection.query(deleteProyectoQuery, [proyecto_id], (proyectoError, proyectoResult) => {
-                if (proyectoError) {
-                    connection.rollback(() => {
-                        console.error(proyectoError);
-                        res.status(500).json({ message: proyectoError.message });
-                    });
-                } else {
-                    // Verifica si hay resultado antes de acceder a sus propiedades
-                    if (proyectoResult && proyectoResult.affectedRows === 0) {
-                        res.status(404).json({ message: 'Proyecto not found' });
+            } else {
+                // Eliminar proyecto principal
+                const deleteProyectoQuery = 'DELETE FROM proyecto WHERE id_proyecto = ?';
+                connection.query(deleteProyectoQuery, [proyecto_id], (proyectoError, proyectoResult) => {
+                    if (proyectoError) {
+                        connection.rollback(() => {
+                            console.error(proyectoError);
+                            return res.status(500).json({ message: proyectoError.message });
+                        });
                     } else {
                         connection.commit((commitError) => {
                             if (commitError) {
                                 console.error(commitError);
-                                res.status(500).json({ message: commitError.message });
+                                return res.status(500).json({ message: commitError.message });
                             } else {
-                                res.json({ message: 'Proyecto and associated equipos deleted successfully' });
+                                return res.json({ message: 'Proyecto and associated equipos deleted successfully' });
                             }
                         });
                     }
-                }
-            });
+                });
+            }
         });
     });
 };
+
 
 
 
