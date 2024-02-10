@@ -141,7 +141,7 @@ const getEquiposData = (req, res) => {
         }
 
         if (result.length > 0) {
-            res.status(200).json(result);
+            res.status(200).json({result:result});
         } else {
             res.status(404).json({ message: 'No se encontraron datos de equipos' });
         }
