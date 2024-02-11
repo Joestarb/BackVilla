@@ -9,5 +9,6 @@ router.put('/proyecto/:proyecto_id', proyectoControllers.updateProyecto);
 router.get('/proyecto', proyectoControllers.getAllProyectos);
 router.delete('/proyecto/:proyecto_id', proyectoControllers.deleteProyecto);
 router.get('/proyecto/:proyecto_id/equipos', proyectoControllers.getEquiposPorProyecto);
+router.get('/proyecto/:proyecto_id/recurso',proyectoControllers.getRecusosPorProyecto )
 
 module.exports = router;

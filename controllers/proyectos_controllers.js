@@ -81,6 +81,33 @@ const getEquiposPorProyecto = (req, res) => {
     }
 };
 
+const getRecusosPorProyecto = (req, res) => {
+    const proyecto_id = req.params.proyecto_id;
+
+    try {
+        const query = `
+            SELECT recurso.*
+            FROM recurso
+            WHERE recurso.fk_proyecto = ?
+        `;
+        connection.query(query, [proyecto_id], (err, result) => {
+            if (err) {
+                console.error(err);
+                return res.status(500).json({ message: err.message });
+            }
+
+            if (result.length === 0) {
+                return res.status(404).json({ message: 'No se encontraron recursos para este proyecto' });
+            }
+
+            res.json(result);
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: error.message });
+    }
+};
+
 const updateProyecto = (req, res) => {
     const proyecto_id = req.params.proyecto_id;
     const proyecto_update = req.body;
@@ -88,14 +115,13 @@ const updateProyecto = (req, res) => {
     try {
         const query = `
             UPDATE proyecto
-            SET nombre = ?, descripcion = ?, fecha_inicio = ?, fk_equipo = ?, fk_estado = ?
+            SET nombre = ?, descripcion = ?, fecha_inicio = ?, fk_estado = ?
             WHERE id_proyecto = ?
         `;
         const values = [
             proyecto_update.nombre,
             proyecto_update.descripcion,
             proyecto_update.fecha_inicio,
-            proyecto_update.fk_equipo,
             proyecto_update.fk_estado,
             proyecto_id,
         ];
@@ -186,5 +212,6 @@ module.exports = {
     updateProyecto,
     getAllProyectos,
     deleteProyecto,
+    getRecusosPorProyecto,
     getEquiposPorProyecto,
 };
