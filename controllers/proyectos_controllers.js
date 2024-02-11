@@ -54,6 +54,33 @@ const getProyectoById = (req, res) => {
     }
 };
 
+const getEquiposPorProyecto = (req, res) => {
+    const proyecto_id = req.params.proyecto_id;
+
+    try {
+        const query = `
+            SELECT equipo.*
+            FROM equipo
+            WHERE equipo.fk_proyecto = ?
+        `;
+        connection.query(query, [proyecto_id], (err, result) => {
+            if (err) {
+                console.error(err);
+                return res.status(500).json({ message: err.message });
+            }
+
+            if (result.length === 0) {
+                return res.status(404).json({ message: 'No se encontraron equipos para este proyecto' });
+            }
+
+            res.json(result);
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: error.message });
+    }
+};
+
 const updateProyecto = (req, res) => {
     const proyecto_id = req.params.proyecto_id;
     const proyecto_update = req.body;
@@ -159,4 +186,5 @@ module.exports = {
     updateProyecto,
     getAllProyectos,
     deleteProyecto,
+    getEquiposPorProyecto,
 };

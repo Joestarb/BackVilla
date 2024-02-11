@@ -9,9 +9,9 @@ const port = 8080;
 
 app.use(express.json());
 app.use(cors({
-  origin: 'http://localhost:5173',
-  methods: 'GET, POST, PUT, DELETE, PATCH',
-  allowedHeaders: 'Content-Type, Access-Control-Allow-Origin',
+  origin: 'https://localhost:5173',
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
+  allowedHeaders: ['Content-Type', 'Access-Control-Allow-Origin'],
 }));
 
 const LoginRouter = require ('./routes/login_routes');
@@ -35,11 +35,11 @@ app.use(RolesRouter);
 const TareasRouter = require ('./routes/tareas_routes.js');
 app.use(TareasRouter);
 
-// https.createServer({
-//   cert: fs.readFileSync('C:/Windows/System32/cert.crt'),
-//   key: fs.readFileSync('C:/Windows/System32/cert.key')
-// }, app).listen(port, () => {
-//   console.log(`Servidor escuchando en https://localhost:${port}`);
-// });
-app.listen(port, () => {
-console.log(`Servidor escuchando en http://localhost:${port}`);});
+https.createServer({
+  cert: fs.readFileSync('C:/Windows/System32/cert.crt'),
+  key: fs.readFileSync('C:/Windows/System32/cert.key')
+}, app).listen(port, () => {
+  console.log(`Servidor escuchando en https://localhost:${port}`);
+});
+// app.listen(port, () => {
+// console.log(`Servidor escuchando en http://localhost:${port}`);});
