@@ -5,14 +5,13 @@ const createProyecto = (req, res) => {
 
     try {
         const query = `
-            INSERT INTO proyecto (nombre, descripcion, fecha_inicio, fk_equipo, fk_estado )
-            VALUES (?, ?, ?, ?, ?, ?)
+            INSERT INTO proyecto (nombre, descripcion, fecha_inicio, fk_estado)
+            VALUES (?, ?, ?, ?)
         `;
         const values = [
             proyecto_create.nombre,
             proyecto_create.descripcion,
             proyecto_create.fecha_inicio,
-            proyecto_create.fk_equipo,
             proyecto_create.fk_estado,
         ];
 
@@ -30,6 +29,7 @@ const createProyecto = (req, res) => {
         res.status(500).json({ message: error.message });
     }
 };
+
 
 const getProyectoById = (req, res) => {
     const proyecto_id = req.params.proyecto_id;
