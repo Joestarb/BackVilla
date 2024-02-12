@@ -59,24 +59,35 @@ const getEquipoById = (req, res) => {
 };
 
 const updateEquipo = (req, res) => {
-    const equipoId = req.params.equipo_id;
+    const equipoId = parseInt(req.params.equipo_id);
+    if (isNaN(equipoId)) {
+        res.status(400).json({ message: 'Invalid equipo ID' });
+        return;
+    }
+
     const equipoUpdate = req.body;
-
-    const updateFields = Object.entries(equipoUpdate).reduce((acc, [key, value]) => {
-        if (value !== undefined) {
-            acc[key] = value;
-        }
-        return acc;
-    }, {});
-
-    if (Object.keys(updateFields).length === 0) {
+    if (Object.keys(equipoUpdate).length === 0) {
         res.status(400).json({ message: 'No fields to update' });
         return;
     }
 
+    const validFields = ['nombre', 'fk_proyecto'];
+    for (const key in equipoUpdate) {
+        if (!validFields.includes(key)) {
+            res.status(400).json({ message: `Invalid field: ${key}` });
+            return;
+        }
+    }
+
+    const updateFields = {};
+    validFields.forEach(field => {
+        if (equipoUpdate[field] !== undefined) {
+            updateFields[field] = equipoUpdate[field];
+        }
+    });
+
     const setClause = Object.keys(updateFields).map(field => `${field} = ?`).join(', ');
     const query = `UPDATE equipo SET ${setClause} WHERE id_equipo = ?`;
-
     const values = [...Object.values(updateFields), equipoId];
 
     connection.query(query, values, (error, result) => {
@@ -93,6 +104,7 @@ const updateEquipo = (req, res) => {
         }
     });
 };
+
 
 const deleteEquipo = (req, res) => {
     const equipoId = req.params.equipo_id;
