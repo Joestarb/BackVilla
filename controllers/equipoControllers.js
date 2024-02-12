@@ -105,33 +105,25 @@ const deleteEquipo = (req, res) => {
             return;
         }
 
-        // Eliminar proyectos asociados al equipo
-        const updateProyectosQuery = "UPDATE proyecto SET fk_equipo = NULL WHERE fk_equipo = ?";
-        connection.query(updateProyectosQuery, [equipoId], (error) => {
+        // Eliminar el equipo
+        const deleteEquipoQuery = "DELETE FROM equipo WHERE id_equipo = ?";
+        connection.query(deleteEquipoQuery, [equipoId], (error, result) => {
             if (error) {
                 console.error(error);
                 res.status(500).json({ message: 'Internal Server Error' });
                 return;
             }
 
-            // Eliminar el equipo
-            const deleteEquipoQuery = "DELETE FROM equipo WHERE id_equipo = ?";
-            connection.query(deleteEquipoQuery, [equipoId], (error, result) => {
-                if (error) {
-                    console.error(error);
-                    res.status(500).json({ message: 'Internal Server Error' });
-                    return;
-                }
-
-                if (result.affectedRows > 0) {
-                    res.json({ message: 'Equipo disassociated from miembros, proyectos, and deleted successfully' });
-                } else {
-                    res.status(404).json({ message: 'Equipo not found' });
-                }
-            });
+            if (result.affectedRows > 0) {
+                res.json({ message: 'Equipo disassociated from miembros and deleted successfully' });
+            } else {
+                res.status(404).json({ message: 'Equipo not found' });
+            }
         });
     });
 };
+
+
 
 const getEquiposData = (req, res) => {
     connection.query('SELECT * FROM equipoData', (err, result) => {
