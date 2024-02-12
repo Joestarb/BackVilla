@@ -5,13 +5,14 @@ const createProyecto = (req, res) => {
 
     try {
         const query = `
-            INSERT INTO proyecto (nombre, descripcion, fecha_inicio, fk_estado)
-            VALUES (?, ?, ?, ?)
+            INSERT INTO proyecto (nombre, descripcion, fecha_inicio, fecha_fin, fk_estado)
+            VALUES (?, ?, ?, ?, ?)
         `;
         const values = [
             proyecto_create.nombre,
             proyecto_create.descripcion,
             proyecto_create.fecha_inicio,
+            proyecto_create.fecha_fin,
             proyecto_create.fk_estado,
         ];
 
