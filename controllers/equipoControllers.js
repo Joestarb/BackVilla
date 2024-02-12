@@ -3,8 +3,8 @@ const connection = require('../config/db'); // Ajusta la ruta según tu estructu
 const createEquipo = (req, res) => {
     const equipoCreate = req.body;
 
-    const query = "INSERT INTO equipo (nombre) VALUES (?)";
-    const values = [equipoCreate.nombre];
+    const query = "INSERT INTO equipo (nombre, fk_proyecto) VALUES (?, ?)";
+    const values = [equipoCreate.nombre, equipoCreate.fk_proyecto]; // Agregar fk_proyecto al array de valores
 
     connection.query(query, values, (error, result) => {
         if (error) {
@@ -19,6 +19,7 @@ const createEquipo = (req, res) => {
         res.json(createdEquipo);
     });
 };
+
 
 const getAllEquipos = (req, res) => {
     const query = "SELECT * FROM equipo";
